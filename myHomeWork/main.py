@@ -3,7 +3,7 @@ from game_objects import Paddle, Ball, Brick, PowerUp, Laser, Particle, Firework
 import random
 import sys
 
-# Setup (unchanged)
+# Setup
 pygame.init()
 pygame.mixer.init()
 clock = pygame.time.Clock()
@@ -11,9 +11,9 @@ screen_width, screen_height = 800, 600
 screen = pygame.display.set_mode((screen_width, screen_height))
 pygame.display.set_caption("PyGame Arkanoid")
 
-# Colors, Fonts, Mute Setup (same as before)
-BG_COLOR = pygame.Color('grey12')
-BRICK_COLORS = [(178, 34, 34), (255, 165, 0), (255, 215, 0), (50, 205, 50)]
+# New Neon Color Scheme
+BG_COLOR = (18, 0, 40)  # Dark purple background
+BRICK_COLORS = [(255, 20, 147), (0, 255, 255), (173, 255, 47), (255, 255, 0)]  # Neon Pink, Cyan, GreenYellow, Yellow
 title_font = pygame.font.Font(None, 70)
 game_font = pygame.font.Font(None, 40)
 message_font = pygame.font.Font(None, 30)
@@ -34,7 +34,7 @@ try:
     laser_sound = pygame.mixer.Sound('laser.wav')
     toggle_mute()
 except:
-    class Dummy: 
+    class Dummy:
         def play(self): pass
         def set_volume(self, v): pass
     bounce_sound = brick_break_sound = game_over_sound = laser_sound = Dummy()
@@ -43,7 +43,6 @@ except:
 paddle = Paddle(screen_width, screen_height)
 ball = Ball(screen_width, screen_height)
 
-# Brick Wall Function with Level Support
 def create_brick_wall(level=1):
     bricks = []
     rows = 4 + level
@@ -58,7 +57,6 @@ def create_brick_wall(level=1):
             bricks.append(Brick(x, y, brick_width, brick_height, color))
     return bricks
 
-# Variables
 bricks = create_brick_wall()
 power_ups, lasers, particles, fireworks = [], [], [], []
 game_state = 'title_screen'
@@ -66,9 +64,7 @@ score, lives, message_timer = 0, 3, 0
 display_message = ""
 firework_timer, level = 0, 1
 
-# Game Loop
 while True:
-    # Events
     for event in pygame.event.get():
         if event.type == pygame.QUIT: pygame.quit(); sys.exit()
         if event.type == pygame.KEYDOWN:
@@ -90,12 +86,11 @@ while True:
                 lasers.append(Laser(paddle.rect.centerx + 30, paddle.rect.top))
                 laser_sound.play()
 
-    # Update
     screen.fill(BG_COLOR)
 
     if game_state == 'title_screen':
-        screen.blit(title_font.render("ARKANOID", True, (255,255,255)), (screen_width//2 - 130, screen_height//2 - 80))
-        screen.blit(game_font.render("Press SPACE to Start", True, (255,255,255)), (screen_width//2 - 140, screen_height//2 + 10))
+        screen.blit(title_font.render("ARKANOID", True, (0, 255, 255)), (screen_width//2 - 130, screen_height//2 - 80))
+        screen.blit(game_font.render("Press SPACE to Start", True, (255, 20, 147)), (screen_width//2 - 140, screen_height//2 + 10))
 
     elif game_state == 'playing':
         paddle.update()
@@ -114,7 +109,7 @@ while True:
         elif collision in ['wall', 'paddle']:
             bounce_sound.play()
             for _ in range(5):
-                particles.append(Particle(ball.rect.centerx, ball.rect.centery, (255,255,0), 1,3,1,3,0))
+                particles.append(Particle(ball.rect.centerx, ball.rect.centery, (0, 255, 255), 1,3,1,3,0))
 
         for brick in bricks[:]:
             if ball.rect.colliderect(brick.rect):
@@ -176,14 +171,13 @@ while True:
 
     elif game_state == 'you_win' or game_state == 'game_over':
         msg = "YOU WIN!" if game_state == 'you_win' else "GAME OVER"
-        screen.blit(game_font.render(msg, True, (255,255,255)), (screen_width//2 - 80, screen_height//2 - 30))
-        screen.blit(game_font.render("Press SPACE to return to Title", True, (255,255,255)), (screen_width//2 - 200, screen_height//2 + 30))
+        screen.blit(game_font.render(msg, True, (0, 255, 255)), (screen_width//2 - 80, screen_height//2 - 30))
+        screen.blit(game_font.render("Press SPACE to return to Title", True, (255, 20, 147)), (screen_width//2 - 200, screen_height//2 + 30))
 
     if message_timer > 0:
         message_timer -= 1
-        screen.blit(message_font.render(display_message, True, (255,255,255)), (screen_width//2 - 100, screen_height - 60))
+        screen.blit(message_font.render(display_message, True, (173, 255, 47)), (screen_width//2 - 100, screen_height - 60))
 
-    # Particles
     for p in particles[:]:
         p.update()
         if p.size <= 0:
@@ -191,7 +185,6 @@ while True:
     for p in particles:
         p.draw(screen)
 
-    # Mute Status
     mute_text = message_font.render("Muted" if muted else "Sound On", True, (200, 200, 200))
     screen.blit(mute_text, (screen_width - mute_text.get_width() - 10, screen_height - 30))
 
