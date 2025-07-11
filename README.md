@@ -38,5 +38,3 @@ To look for the additions, seek comments started with "!!!"
 1. Add more levels
 1. Add `gameover` screen
 1. Add more powerups
-
-YESSS SIR
